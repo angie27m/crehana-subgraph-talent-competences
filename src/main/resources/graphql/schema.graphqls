@@ -1,0 +1,450 @@
+#TALENT COMPETENCES SCHEMA
+schema {
+	query: Query
+  	mutation: Mutation
+}
+
+#ENUMERATIONS
+enum EvaluationStateEnum {
+	CREATED
+	STARTED
+	FINISHED
+	CLOSED
+}
+
+enum QuestionnaireStateEnum {
+	ASSIGNED
+	IN_PROGRESS,
+	CONFIGURE,
+	FINISHED
+}
+
+enum RelationQuestionnaireEnum {
+	BOSS, 
+	COWORKER, 
+	SUBORDINATE,  
+	AUTO,
+	CLIENTE_INTERNO, 
+	CLIENTE_EXTERNO, 
+	PROVEEDOR,
+	SUPERVISOR, 
+	VP,
+	OTRO
+}
+
+
+# INPUTS
+input FilterByCompetencesEvaluation {
+	name: String
+    state: String
+}
+
+input FilterCompetencesEvaluation {	
+	employee_id: Int!
+	filter_by: FilterByCompetencesEvaluation
+	first: Int!
+    after: String  
+}
+
+input FilterCompetencesEvaluationQuestionnaire {	
+	employee_id: Int!
+	evaluation_id: Int!
+	filter_by: FilterByCompetencesEvaluation
+	first: Int
+    after: String  
+}
+
+input FilterCompetencesGroup {
+	evaluation_id: Int!
+	employee_id: Int!
+	questionnaires_ids: [Int!]!
+}
+
+input Evaluator{
+   id:Int!
+   relation:RelationQuestionnaireEnum!  
+}
+
+input QuestionnaireEvaluators {
+	evaluation_id: Int!
+	evaluated_id: Int!
+	employee_id: Int!
+	evaluators: [Evaluator]
+}
+
+input FilterCompetencesQuestionnaireEvaluator {
+	company_id: Int!
+	evaluation_id: Int!
+	evaluated_id: Int!
+	name: String
+	division_id: Int
+	first: Int!
+    after: String 
+}
+
+
+# TYPES
+type PageInfo {
+    has_previous_page: Boolean!
+    has_next_page: Boolean!
+    start_cursor: String
+    end_cursor: String
+}
+
+type CompetencesResponseInternalError {
+	code: String
+ 	message: String
+}
+
+type CompetencesResponseValidationError {
+	code: String
+ 	message: String
+}
+
+type DivisionTalentType {
+	id: Int!
+	name: String!
+}
+
+type AvatarTalentType {
+	absolute_url: String!
+	relative_url: String!
+}
+
+type JobTalentType {
+	id: Int!
+	name: String!
+}
+
+type EmployeeCompetencesEvaluation {
+    id: ID
+    original_id: Int
+    avatar: AvatarTalentType 
+    full_name: String
+    division : DivisionTalentType
+    job: JobTalentType
+}
+
+type CompetencesEvaluation {
+    id: ID
+    original_id: Int!
+	name: String!
+	date_initial: String!
+	date_final: String!
+	description:String
+	percentage_response: String
+	evaluation_state_2: EvaluationStateEnum!
+	finished_questionnaires: Int
+	total_questionnaires: Int
+	employees: [EmployeeCompetencesEvaluation]
+}
+
+type CompetencesEvaluationEdge {
+	node: CompetencesEvaluation
+	cursor: String!
+}
+
+type CompetencesEvaluationPagination {
+	page_info: PageInfo
+	edges: [CompetencesEvaluationEdge]
+	total_count: Int
+}
+
+type CompetencesGeneralEvaluationPagination {
+	evaluations: CompetencesEvaluationPagination
+}
+
+type Questionnaire {
+	id: ID!
+  	original_id: Int
+  	state: QuestionnaireStateEnum!
+  	evaluated: EmployeeCompetencesEvaluation
+  	relation: String
+  	relation_enum: RelationQuestionnaireEnum
+  	progress: Int
+  	similar_competences_key: String
+  	group_key: String
+  	grouped_questionnaires: [Questionnaire]  
+  	allow_delete: Boolean
+
+}
+
+type QuestionnaireEdge {
+	node: Questionnaire
+	cursor: String!
+}
+
+type QuestionnairePagination {
+	page_info: PageInfo
+	edges: [QuestionnaireEdge]
+	total_count: Int
+}
+
+type QuestionnaireGeneralPagination {
+	evaluation: CompetencesEvaluation
+	questionnaires: QuestionnairePagination
+}
+
+type OptionResponse {
+	label: String!
+	key: String!
+	value: String!
+	percentage: String!
+	parent_key: String
+	other: Boolean!
+	order: Int
+}
+
+type RelationLabelType {
+	value: RelationQuestionnaireEnum! 
+	label: String! 
+}
+
+type CompetencesEvaluationConfiguration {
+	show_comment_competence: Boolean!
+	show_comment_general: Boolean!
+	required_comment_competence: Boolean!
+	required_comment_general: Boolean!
+	min_comment_length: Int!
+	has_active_behaviors_model: Boolean!
+	options_response: [OptionResponse]
+	has_description_competence_active: Boolean!
+	show_autoevaluations_employees: Boolean!
+	show_comment_behavior: Boolean!
+	required_comment_behavior: Boolean!
+	show_dont_know: Boolean!
+	show_comment_general2: Boolean!
+	required_comment_general2: Boolean!
+	show_comment_general3: Boolean!
+	required_comment_general3: Boolean!
+	label_comment: String
+	label_comment2: String
+	label_comment3: String
+	options_explanations: String
+	show_evaluators_icon: Boolean!	
+	hide_add_evaluators_leader: Boolean!	
+	show_edit_evaluation: Boolean!
+	enable_result_evaluate: Boolean!
+	show_all_relations: Boolean!
+	assign_competences_by_leader: Boolean!
+	show_competences_brief: Boolean!
+	relations: [RelationLabelType]
+	show_evaluators_table:Boolean!
+	show_my_team_tab : Boolean!
+	disable_mass_qualification : Boolean!
+}
+
+type ExecutedCompetencesPayload {
+	executed: Boolean
+}
+
+type Question {
+	id: ID!
+  	original_id: Int
+  	name: String
+  	response: Float
+  	suggestion: String
+}
+
+
+type Competence {
+	id: ID!
+  	original_id: Int
+  	name: String
+  	result: String
+  	questions: [Question]
+  	comment: String
+}
+
+type CompetencesDetail {
+    employee_result:String
+	competences: [Competence]
+	general_comment1:String
+	general_comment2:String
+	general_comment3:String
+}
+
+type EmployeeTalentType {
+    id: ID
+    original_id: Int
+    avatar: AvatarTalentType 
+    full_name: String
+    division : DivisionTalentType
+    job: JobTalentType
+}
+
+type EmployeeTalentEdge {
+	cursor: String!
+	node: EmployeeTalentType
+}
+
+type EmployeeTalentEdgePagination {
+	edges: [EmployeeTalentEdge]
+	page_info: PageInfo
+	total_count:Int
+}
+
+type EmployeeTalentPagination {
+	employees: EmployeeTalentEdgePagination
+}
+
+type QuestionForm {
+	id: ID!
+  	original_id: Int
+  	response: Float
+    completed_question: Boolean
+    comment: String
+    questionnaire_id: Int
+    response_auto:Float
+}
+
+type BehaviorForm {
+    id: ID!
+    original_id:Int
+    name: String
+    description: String
+    completed_behavior: Boolean
+    questions: [QuestionForm]
+    
+}
+
+type CommentForm {
+     id: ID!
+     original_id : Int
+     questionnaire_id: Int
+     comment: String
+}
+
+type CompetenceForm {
+    id: ID!
+    original_id: Int
+    name: String
+    description: String
+    completed_competence: Boolean
+    behaviors: [BehaviorForm]
+    comments:[CommentForm]
+}
+
+
+type CompetenceFormEdge {
+	node: CompetenceForm
+	cursor: String!
+}
+
+type CompetenceFormPagination {
+	page_info: PageInfo
+	edges: [CompetenceFormEdge]
+	total_count: Int
+}
+
+
+type CompetenceGeneralForm{
+    evaluation:CompetencesEvaluation
+    questionnaires:[Questionnaire]
+    competences: CompetenceFormPagination
+    general_comments1: [CommentForm]
+    general_comments2: [CommentForm]
+    general_comments3: [CommentForm]
+    
+
+}
+
+enum QualifyTypeEnum{
+	QUESTION_RESPONSE,
+	QUESTION_COMMENT,
+    COMPETENCE_COMMENT,
+    GENERAL_COMMENT1,
+    GENERAL_COMMENT2,
+    GENERAL_COMMENT3
+}
+
+input QuestionnaireQualify {
+   question_id : Int
+   question_response:Float
+   all_questionnaires:[Int]
+   questionnaire_id: Int
+   question_comment: String
+   competence_id: Int
+   comment_competence: String
+   general_comment1: String
+   general_comment2: String
+   general_comment3: String
+   type: QualifyTypeEnum!
+
+}
+
+type QualifyPayload{
+	competence_id:Int
+    completed_competence:Boolean
+    behavior_id: Int
+    completed_behavior: Boolean
+    question_id: Int
+    completed_question: Boolean
+    success: Boolean
+}
+
+type QuestionnaireSummary{
+
+    questionnaire_id:Int
+    result: Float
+}
+
+
+type CompetenceSummary{
+
+   id: ID!
+   original_id: Int
+   name: String
+   questionnaire_summary_competences:[QuestionnaireSummary]
+              
+}
+
+type QualifySummary {
+
+    questionnaires_general_summary:[QuestionnaireSummary]
+    competences_summary: [CompetenceSummary]
+
+}
+
+
+# UNIONS
+union ResponseCompetencesEvaluation = CompetencesGeneralEvaluationPagination | CompetencesResponseInternalError | CompetencesResponseValidationError
+union ResponseQuestionnaire = QuestionnaireGeneralPagination | CompetencesResponseInternalError | CompetencesResponseValidationError
+union ResponseCompetencesConfiguration = CompetencesEvaluationConfiguration | CompetencesResponseInternalError | CompetencesResponseValidationError
+union ResponseExecutionCompetences = ExecutedCompetencesPayload | CompetencesResponseInternalError | CompetencesResponseValidationError
+union ResponseQuestionnaireDetail = CompetencesDetail | CompetencesResponseInternalError | CompetencesResponseValidationError
+union TalentResponseEmployee = EmployeeTalentPagination | CompetencesResponseInternalError | CompetencesResponseValidationError
+union ResponseCompetenceGeneralForm = CompetenceGeneralForm | CompetencesResponseInternalError | CompetencesResponseValidationError
+union ResponseQuestionnaireQualify = QualifyPayload | CompetencesResponseInternalError | CompetencesResponseValidationError
+union ResponseQualifySummary = QualifySummary | CompetencesResponseInternalError | CompetencesResponseValidationError
+
+
+# QUERIES
+type TalentCompetencesQueries {
+	get_competences_evaluations(input: FilterCompetencesEvaluation) : ResponseCompetencesEvaluation
+	get_competences_evaluation_questionnaires(input: FilterCompetencesEvaluationQuestionnaire) : ResponseQuestionnaire
+	get_competences_evaluation_configuration(evaluation_id: Int!, employee_id: Int!) : ResponseCompetencesConfiguration
+	get_competences_evaluation_questionnaire_detail(questionnaire_id: Int!, employee_id:Int!) : ResponseQuestionnaireDetail
+	get_competences_questionnaires_evaluators(employee_id: Int!, evaluation_id: Int!, evaluated_id: Int!, first: Int!, after: String) : ResponseQuestionnaire
+	get_competences_questionnaires_available_evaluators(input: FilterCompetencesQuestionnaireEvaluator!) : TalentResponseEmployee 
+	get_competences_questions_by_questionnaires(questionnaires_id :  [Int]!, evaluation_id: Int!,employee_id: Int!, first: Int, after: String): ResponseCompetenceGeneralForm 
+    get_competences_qualify_summary(questionnaires_id :  [Int]!, evaluation_id: Int!, employee_id: Int!) : ResponseQualifySummary
+}
+
+# MUTATIONS
+type TalentCompetencesMutations {
+	create_competence_questionnaire_group(input: FilterCompetencesGroup!) : ResponseExecutionCompetences
+	delete_competence_questionnaire_group(evaluation_id: Int!, group_key: String!) : ResponseExecutionCompetences
+	delete_competence_questionnaire_evaluator(questionnaire_id:Int!):ResponseExecutionCompetences
+	create_competence_questionnaire_evaluators(input:  QuestionnaireEvaluators!):ResponseExecutionCompetences
+	qualify_competence_questionnaire(input: QuestionnaireQualify!) : ResponseQuestionnaireQualify
+	finish_competence_questionnaires(questionnaires_id :  [Int]!, evaluation_id: Int!,employee_id: Int!): ResponseExecutionCompetences
+}
+
+type Query { 
+  	talent_competences: TalentCompetencesQueries
+}
+
+type Mutation { 
+  	talent_competences: TalentCompetencesMutations
+}

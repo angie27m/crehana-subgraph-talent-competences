@@ -1,0 +1,57 @@
+
+/target/
+/target/*
+/.classpath
+/.project
+/.settings/org.eclipse.jdt.core.prefs
+/target/lib/acsendo-api-core-0.0.1-SNAPSHOT.jar
+.classpath
+.settings/org.springframework.ide.eclipse.prefs
+.settings/org.eclipse.m2e.core.prefs
+.settings/org.eclipse.jdt.core.prefs
+.settings/org.eclipse.core.resources.prefs
+.project
+.springBeans
+.settings/org.jboss.ide.eclipse.as.core.prefs
+.settings/org.eclipse.wst.common.project.facet.core.xml
+.settings/org.hibernate.eclipse.console.prefs
+src/main/java/META-INF/MANIFEST.MF
+.settings/org.eclipse.wst.common.component
+.settings/org.eclipse.wst.validation.prefs
+
+HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**
+!**/src/test/**
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+/bin
+
+### VS Code ###
+.vscode/
+.DS_Store
+.gitlab-ci.yml
+gitlab-ci.yml
+Dockerfile
